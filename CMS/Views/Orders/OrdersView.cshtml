@@ -1,0 +1,273 @@
+﻿@{ 
+	ViewBag.Title = "OrdersView";
+	if (Session["userrole"] == null)
+	{
+		Html.Action("LoginPageView", "LoginPage");
+	}
+	else
+	{
+		int userid = (int)Session["userid"];
+		string userrole = Session["userrole"].ToString();
+		if (userrole.Equals("SR"))
+		{
+			Layout = "~/Views/Shared/LoginLayoutSP.cshtml";
+		}
+		else if (userrole.Equals("A"))
+		{
+			Layout = "~/Views/Shared/LoginLayout.cshtml";
+		}
+		else
+		{
+
+		}
+	}
+}
+
+@model IEnumerable<CMS.ViewModel.Ordersvm>
+<script src="@Url.Content("~/jquery-1.7.1.min.js")" type="text/javascript"></script>
+<div class="container">
+	<div class="row">
+		<div class="col-md-3">
+			<h2>OrdersView</h2>
+		</div>
+		<div class="col-md-9" style="text-align:right">
+			<br />
+			<h9>
+				Welcome!
+			</h9>@Session["name"].ToString()<br />
+			<p id="showtime"></p>
+		</div>
+	</div>
+
+	@{
+		var grid = new WebGrid(Model, columnNames: new[] { "orderID", "customerName", "RequiredDate", "ShippingStatus", "ShippingAddress", "BillingAddress" }, rowsPerPage: 10);
+	}
+
+
+	<div class="row">
+		<div class="col-md-4">
+			@using (Html.BeginForm("OrdersView", "Orders", FormMethod.Post))
+			{
+				@Html.AntiForgeryToken()
+				<fieldset>
+					<div>
+						@Html.Label("Order Date:")
+						@Html.DropDownList("dateFilter", (IEnumerable<SelectListItem>)ViewBag.dateFilter, new { onchange = "this.form.submit()" })
+					</div>
+				</fieldset>
+			}
+		</div>
+		<div class="col-md-4">
+			@using (Html.BeginForm("OrdersViewOrderID", "Orders", FormMethod.Post))
+			{
+				@Html.AntiForgeryToken()
+				<fieldset class="row">
+					<div class="">
+						@Html.Label(" Order ID: ")
+						@Html.TextBox("orderID", "", new { onchange = "this.form.submit();" })
+					</div>
+				</fieldset>
+			}
+		</div>
+		<div class="col-md-4">
+			@using (Html.BeginForm("OrdersViewProductID", "Orders", FormMethod.Post))
+			{
+				@Html.AntiForgeryToken()
+				<fieldset>
+					<div>
+						@Html.Label(" Product ID: ")
+						@Html.TextBox("productID", "", new { onchange = "this.form.submit();" })
+					</div>
+				</fieldset>
+			}
+		</div>
+
+
+
+	</div>
+	<div class="row">
+		<div id="gridField">
+			@grid.GetHtml(tableStyle: "wg table",
+	headerStyle: "wg-header",
+	alternatingRowStyle: "wg-alterRow",
+	rowStyle: "wg-row",
+				 mode: WebGridPagerModes.All,
+				 columns: grid.Columns(
+				 grid.Column("orderID"),
+				 grid.Column("customerName", format: @<span>
+					<span id="spancustomer_Name_@item.orderID">@item.customerName</span> @Html.TextBox("customer_Name_" + (int)item.orderID, (string)item.customerName, new { @style = "display:none" })
+				</span>),
+				grid.Column("RequiredDate", format: @<span>
+						<span id="spanRequired_Date_@item.orderID">@item.RequiredDate</span> @Html.TextBox("Required_Date_" + (int)item.orderID, (System.DateTime)item.RequiredDate, new { @style = "display:none" })
+					</span>),
+				grid.Column("ShippingStatus", format: @<span>
+						<span id="spanShipping_Status_@item.orderID">@item.ShippingStatus</span> @Html.TextBox("Shipping_Status_" + (int)item.orderID, (string)item.ShippingStatus, new { @style = "display:none" })
+					</span>),
+				grid.Column("ShippingAddress", format: @<span>
+						<span id="spanShipping_Address_@item.orderID">@item.ShippingAddress</span> @Html.TextBox("Shipping_Address_" + (int)item.orderID, (string)item.ShippingAddress, new { @style = "display:none" })
+					</span>),
+				grid.Column("BillingAddress", format: @<span>
+						<span id="spanBilling_Address_@item.orderID">@item.BillingAddress</span> @Html.TextBox("Billing_Address_" + (int)item.orderID, (string)item.BillingAddress, new { @style = "display:none" })
+					</span>),
+				grid.Column(header: "Actions", format:@<text>
+						<a href="#" id="Edit_@item.orderID" class="edit">Edit</a>
+						<a href="#" id="Update_@item.orderID" style="display:none" class="update">Update</a>
+						<a href="#" id="Cancel_@item.orderID" style="display:none" class="cancel">Cancel</a>
+						<a href="#" id="Delete_@item.orderID" class="delete">Delete</a></text>)
+					)
+				)
+		</div>
+	</div>
+</div>
+
+		@section scripts {
+			<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js" type="text/javascript"></script>
+			<script type="text/javascript">
+				$(".edit").live("click", function () {
+					var str = $(this).attr("id").split("_");
+					//get orderID
+					id = str[1];
+					// tricks
+					//var customer_Name = "#customer_Name_" + id;
+					//var spancustomer_Name = "#spancustomer_Name_" + id;
+					//var Required_Date = "#Required_Date_" + id;
+					//var spanRequired_Date = "#spanRequired_Date_" + id;
+					var Shipping_Status = "#Shipping_Status_" + id;
+					var spanShipping_Status = "#spanShipping_Status_" + id;
+					//var Shipping_Address = "#Shipping_Address_" + id;
+					//var spanShipping_Address = "#spanShipping_Address_" + id;
+					//var Billing_Address = "#Billing_Address_" + id;
+					//var spanBilling_Address = "#spanBilling_Address_" + id;
+
+					//$(customer_Name).show();
+					//$(spancustomer_Name).hide();
+					//$(Required_Date).show();
+					//$(spanRequired_Date).hide();
+					$(Shipping_Status).show();
+					$(spanShipping_Status).hide();
+					//$(Shipping_Address).show();
+					//$(spanShipping_Address).hide();
+					//$(Billing_Address).show();
+					//$(spanBilling_Address).hide();
+
+
+					$("#Update_" + id).show();
+					$("#Cancel_" + id).show();
+					$("#Delete_" + id).hide();
+					$("#Edit_" + id).hide();
+				});
+
+				$(".cancel").live("click", function () {
+					var str = $(this).attr("id").split("_");
+					id = str[1];
+					var flag = confirm('Are you sure to cancel');
+					if (flag) {
+						$("#Update_" + id).hide();
+						$(this).hide();
+						$("#Edit_" + id).show();
+						$("#Delete_" + id).show();
+						var Shipping_Status = "#Shipping_Status_" + id;
+						var spanShipping_Status = "#spanShipping_Status_" + id;
+						$(Shipping_Status).hide();
+						$(spanShipping_Status).show();
+					}
+				});
+
+				// save onclick
+				$(".update").live("click", function () {
+					var str = $(this).attr("id").split("_");
+					id = str[1];
+
+					//var customer_Name = "#customer_Name_" + id;
+					//var spancustomer_Name = "#spancustomer_Name_" + id;
+					//var Required_Date = "#Required_Date_" + id;
+					//var spanRequired_Date = "#spanRequired_Date_" + id;
+					var Shipping_Status = $("#Shipping_Status_" + id).val();
+					var spanShipping_Status = $("#spanShipping_Status_" + id).val;
+					//var Shipping_Address = "#Shipping_Address_" + id;
+					//var spanShipping_Address = "#spanShipping_Address_" + id;
+					//var Billing_Address = "#Billing_Address_" + id;
+					//var spanBilling_Address = "#spanBilling_Address_" + id;
+					var flag = confirm('Are you sure to change ?');
+					if (id != "" && flag) {
+						$.ajax({
+							type: "GET",
+							contentType: "application/json; charset=utf-8",
+							url: '@Url.Action("Updateorder", "Orders")',
+							data: { "id": id },
+							dataType: "json",
+							beforeSend: function () {
+							},
+							success: function (data) {
+								if (data.result == true) {
+									$("#Update_" + id).hide();
+									$("#Cancel_" + id).hide();
+									$("#Edit_" + id).show();
+									$("#Delete_" + id).show();
+
+									//var customer_Name = "#customer_Name_" + id;
+									//var spancustomer_Name = "#spancustomer_Name_" + id;
+									//var Required_Date = "#Required_Date_" + id;
+									//var spanRequired_Date = "#spanRequired_Date_" + id;
+									var Shipping_Status = "#Shipping_Status_" + id;
+									var spanShipping_Status = "#spanShipping_Status_" + id;
+									//var Shipping_Address = "#Shipping_Address_" + id;
+									//var spanShipping_Address = "#spanShipping_Address_" + id;
+									//var Billing_Address = "#Billing_Address_" + id;
+									//var spanBilling_Address = "#spanBilling_Address_" + id;
+
+									//$(customer_Name).hide();
+									//$(spancustomer_Name).show();
+									//$(Required_Date).hide();
+									//$(spanRequired_Date).show();
+									$(Shipping_Status).hide();
+									$(spanShipping_Status).show();
+									//$(Shipping_Address).hide();
+									//$(spanShipping_Address).show();
+									//$(Billing_Address).hide();
+									//$(spanBilling_Address).show();
+
+									//$(spancustomer_Name).text($(customer_Name).val());
+									//$(spanRequired_Date).text($(Required_Date).val());
+									$(spanShipping_Status).text($(Shipping_Status).val());
+									//$(spanShipping_Address).text($(Shipping_Address).val());
+									//$(spanBilling_Address).text($(Billing_Address).val());
+								}
+								else {
+									alert('There is some error');
+								}
+							}
+						});
+					}
+				});
+				$(".delete").live("click", function () {
+					var str = $(this).attr("id").split("_");
+					id = str[1];
+
+					var flag = confirm('Are you sure to delete ?');
+					if (id != "" && flag) {
+						$.ajax({
+							type: "GET",
+							contentType: "application/json; charset=utf-8",
+							url: '@Url.Action("Deleteorder", "Orders")',
+							data: { "id": id },
+							dataType: "json",
+							beforeSend: function () { },
+							success: function (data) {
+								if (data.result == true) {
+									$("#Update_" + id).parents("tr").remove();
+								}
+								else {
+									alert('There is some error');
+								}
+							}
+						});
+					}
+				});
+			</script>
+			<script type="text/javascript" language="javascript">
+				window.onload=function (){
+					setInterval("var d = new Date(); var days = ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday']; var _m = parseInt(d.getMonth()) + 1; document.getElementById('showtime').innerHTML=days[ d.getDay() ]+' '+d.getFullYear()+'/'+_m+'/'+d.getDate()+' '+d.getHours()+':'+d.getMinutes()+':'+d.getSeconds();", 1000);
+			   }
+			</script>
+		}

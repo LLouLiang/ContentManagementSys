@@ -1,0 +1,179 @@
+﻿@model IEnumerable<CMS.Models.getProColor_Result>
+@{
+	ViewBag.Title = "ColorView";
+	if (Session["userrole"] == null)
+	{
+		Html.Action("LoginPageView", "LoginPage");
+	}
+	else
+	{
+		int userid = (int)Session["userid"];
+		string userrole = Session["userrole"].ToString();
+		if (userrole.Equals("SR"))
+		{
+			Layout = "~/Views/Shared/LoginLayoutSP.cshtml";
+		}
+		else if (userrole.Equals("A"))
+		{
+			Layout = "~/Views/Shared/LoginLayout.cshtml";
+		}
+		else
+		{
+
+		}
+	}
+	var grid1 = new WebGrid(Model, canPage: true, rowsPerPage: 10, columnNames: new[] { "productID", "productName", "Colors", "categoryName" });
+	grid1.Pager(WebGridPagerModes.All);
+}
+
+
+<div class="container">
+	<div class="row">
+		<div class="col-md-3">
+			<h2>Colors</h2>
+		</div>
+		<div class="col-md-9" style="text-align:right">
+			<br />
+			<h9>
+				Welcome!
+			</h9>@Session["name"].ToString()<br />
+			<p id="showtime"></p>
+		</div>
+	</div>
+	<div class="row">
+		<div class="col-md-8">
+			@using (Html.BeginForm("ColorView", "Color", FormMethod.Post))
+			{
+				@Html.AntiForgeryToken()
+				<fieldset class="nav navbar-nav">
+					<div class="nav navbar-nav">
+						@Html.Label("MainCategories")
+						@Html.DropDownList("mainID", (IEnumerable<SelectListItem>)ViewBag.mainID, new { onchange = "this.form.submit()" })
+					</div>
+				</fieldset>
+				<fieldset class="nav navbar-nav">
+					<div class="nav navbar-nav">
+						@Html.Label("SubCategories")
+						@Html.DropDownList("subID", (IEnumerable<SelectListItem>)ViewBag.subID, new { onchange = "this.form.submit()" })
+					</div>
+				</fieldset>
+			}
+		</div>
+		<div class="col-md-4">
+			@using (Html.BeginForm("ColorsByProID", "Color", FormMethod.Post))
+			{
+				@Html.AntiForgeryToken()
+				<fieldset class="nav navbar-nav">
+					<div class="nav navbar-nav">
+						@Html.Label(" Product ID: ")
+						@Html.TextBox("productID", "", new { onchange = "this.form.submit();" })
+					</div>
+				</fieldset>
+			}
+		</div>
+	</div>
+	<div class="row">
+		<div id="gridField">
+
+			@grid1.GetHtml(tableStyle: "wg table",
+	headerStyle: "wg-header",
+	alternatingRowStyle: "wg-alterRow",
+	rowStyle: "wg-row",
+	fillEmptyRows: false,
+	mode: WebGridPagerModes.All,
+
+	columns: grid1.Columns(
+
+		grid1.Column("productID", header: "ProductID "),
+		grid1.Column("productName", header: "ProductName "),
+		grid1.Column("Colors", header: "Avaliable Color", format: @<span>
+			<span id="spancolors_@item.productID">@item.Colors</span> @Html.TextBox("available_colors" + (int)item.productID, (string)item.Colors, new { @style = "display:none" })
+		</span>),
+		grid1.Column("categoryName", header: "CategoryName"),
+		grid1.Column(header: "Actions", format:@<text>
+			<a href="#" id="Edit_@item.productID" class="edit">Edit</a>
+			<a href="#" id="Update_@item.productID" style="display:none" class="update">Update</a>
+			<a href="#" id="Cancel_@item.productID" style="display:none" class="cancel">Cancel</a>
+		</text>)
+		))
+		</div>
+	</div>
+</div>
+
+
+
+@section scripts {
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js" type="text/javascript"></script>
+    <script type="text/javascript">
+        $(".edit").live("click", function () {
+            var str = $(this).attr("id").split("_");
+            id = str[1];
+            var avaliablecolors = "#available_colors" + id;
+            var spancolors = "#spancolors_" + id;
+            $(spancolors).hide();
+            $(avaliablecolors).show();
+            $("#Update_" + id).show();
+            $("#Cancel_" + id).show();
+           
+            $(this).hide();
+
+        });
+        $(".cancel").live("click", function () {
+            var str = $(this).attr("id").split("_");
+            id = str[1];
+            var flag = confirm('Are you sure to cancel');
+            if (flag) {
+                var avaliablecolors = "#available_colors" + id;
+                var spancolors = "#spancolors_" + id;
+                var avaliablecolors = $("#available_colors" + id).val();
+                var spancolors = $("#spancolors_" + id).val();
+                $("#Update_" + id).hide();
+                $(this).hide();
+                $("#Edit_" + id).show();
+                avaliablecolors = spancolors;
+                $(spancolors).show();
+                $(avaliablecolors).hide();
+            }
+            
+
+        });
+        $(".update").live("click", function () {
+            var str = $(this).attr("id").split("_");
+            id = str[1];
+            var avaliablecolors = $("#available_colors" + id).val();
+            var spancolors = $("#spancolors_" + id).val();
+            var flag = confirm('Are you sure to change ?');
+            if (id != "" && flag) {
+                $.ajax({
+                    type: "GET",
+                    contentType: "application/json; charset=utf-8",
+                    url: '@Url.Action("UpdateColor", "Color")',
+                    data: { "id": id, "Colors": avaliablecolors },
+                    dataType: "json",
+                    beforeSend: function () {
+                    },
+                    success: function (data) {
+                        if (data.result == true) {
+                            $("#Update_" + id).hide();
+                            $("#Cancel_" + id).hide();
+                            $("#Edit_" + id).show();
+                            var avaliablecolors = "#available_colors" + id;
+                            var spancolors = "#spancolors_" + id;
+                            $(spancolors).show();
+                            $(avaliablecolors).hide();
+                            $(spancolors).text($(avaliablecolors)).val();
+                        }
+                        else {
+                            alert('You enter a invalid color or wrong format! Valid format:"Red/Black/yellow" ');
+                        }
+                    }
+                });
+            }
+        });
+     </script>
+	<script type="text/javascript" language="javascript">
+			window.onload=function (){
+				setInterval("var d = new Date(); var days = ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday']; var _m = parseInt(d.getMonth()) + 1; document.getElementById('showtime').innerHTML=days[ d.getDay() ]+' '+d.getFullYear()+'/'+_m+'/'+d.getDate()+' '+d.getHours()+':'+d.getMinutes()+':'+d.getSeconds();", 1000);
+		   }
+	</script>
+}

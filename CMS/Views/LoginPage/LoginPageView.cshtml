@@ -1,0 +1,39 @@
+﻿@model CMS.ViewModel.Uservm
+@{
+	ViewBag.Title = "LoginPage";
+	Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+	<div class="wrapper">
+		<div class="content">
+			@using (Html.BeginForm("LoginPageView", "LoginPage", FormMethod.Post))
+			{
+				@Html.ValidationSummary(true)
+				{
+					<div class="form_wrapper">
+						<h3>Login</h3>
+						<div>
+							<label>@Html.Label("LoginID: ")</label>
+							@Html.TextBoxFor(model => model.LoginID)
+							@Html.ValidationMessageFor(model => model.LoginID, "", new { @style = "color:#cc0000;" })
+						</div>
+						<div>
+							<label>@Html.Label("Password: ")</label>
+							@Html.PasswordFor(Model => Model.LoginPwd)
+							@Html.ValidationMessageFor(Model => Model.LoginPwd, "", new { @style = "color:#cc0000;" })
+						</div>
+						<div>
+							<label>@Html.ActionLink("Forgot Password", "forgotPassword", "fpPage")</label>
+						</div>
+						<div class="bottom">
+							<div class="remember">
+								@Html.CheckBoxFor(Model => Model.rememberMe)<span>Remember Me</span>
+							</div>
+							<input type="submit" class="btn btn-group" value="Login" />
+							<div class="clear"></div>
+						</div>
+					</div>
+				}
+			}
+			</div>
+		</div>

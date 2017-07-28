@@ -1,0 +1,403 @@
+﻿
+@model IEnumerable<CMS.Models.getProByUserID_Result>
+@{
+	ViewBag.Title = "Products";
+	if (Session["userrole"]==null)
+	{
+		Html.Action("LoginPageView", "LoginPage");
+	}
+	else
+	{
+		int userid = (int)Session["userid"];
+		string userrole = Session["userrole"].ToString();
+		if (userrole.Equals("SR"))
+		{
+			Layout = "~/Views/Shared/LoginLayoutSP.cshtml";
+		}
+		else if (userrole.Equals("A"))
+		{
+			Layout = "~/Views/Shared/LoginLayout.cshtml";
+		}
+		else
+		{
+
+		}
+	}
+	var grid1 = new WebGrid(Model, canPage: true, rowsPerPage: 10, columnNames: new[] { "productID", "ProductName", "manufacturerName", "UnitPrice", "categoryName" });
+	grid1.Pager(WebGridPagerModes.All);
+}
+<div class="container">
+	<div class="row">
+		<div class="col-md-3">
+			<h2>Products</h2>
+		</div>
+		<div class="col-md-9" style="text-align:right">
+			<br />
+			<h9>
+				Welcome!
+			</h9>@Session["name"].ToString()<br />
+			<p id="showtime"></p>
+		</div>
+	</div>
+	<div class="row">
+		<div class="col-md-8">
+			@using (Html.BeginForm("Products", "ProductPage", FormMethod.Post))
+			{
+				@Html.AntiForgeryToken()
+				<fieldset class="nav navbar-nav">
+					<div class="nav navbar-nav">
+						@Html.Label("MainCategories")
+						@Html.DropDownList("mainID", (IEnumerable<SelectListItem>)ViewBag.mainID, new { onchange = "this.form.submit()" })
+					</div>
+				</fieldset>
+				<fieldset class="nav navbar-nav">
+					<div class="nav navbar-nav">
+						@Html.Label("SubCategories")
+						@Html.DropDownList("subID", (IEnumerable<SelectListItem>)ViewBag.subID, new { onchange = "this.form.submit()" })
+					</div>
+				</fieldset>
+			}
+		</div>
+		<div class="col-md-4">
+			@using (Html.BeginForm("ProductViewProductID", "ProductPage", FormMethod.Post))
+	{
+		@Html.AntiForgeryToken()
+		<fieldset class="nav navbar-nav">
+			<div class="nav navbar-nav">
+				@Html.Label(" Product ID: ")
+				@Html.TextBox("productID", "", new { onchange = "this.form.submit();" })
+			</div>
+		</fieldset>
+	}
+		</div>
+	</div>
+	<div class="row">
+		@grid1.GetHtml(
+	   tableStyle: "wg table",
+	headerStyle:"wg-header",
+	alternatingRowStyle: "wg-alterRow",
+	rowStyle: "wg-row",
+	fillEmptyRows: false,
+	mode: WebGridPagerModes.All,
+	columns: grid1.Columns(
+	grid1.Column("productID", header: "ProductID "),
+	grid1.Column("ProductName", header: "ProductName "),
+	grid1.Column("manufacturerName", header: "Manufacturer "),
+	grid1.Column("UnitPrice", header: "Price "),
+	grid1.Column("categoryName", header: "CategoryName")
+	))
+
+		<a href="#" id="addproductlink" onclick="popAddPro();">Add a Product</a>
+		<div class="avgrund-contents" style="display:none">
+			<button onclick="avgrund.activate();" id="viewCss">View</button>
+		</div>
+	</div>
+</div>
+
+<div class="avgrund-popup" style="height:380px;width:600px;">
+	<div id="dialogprint">
+				<div style="float:left;width:45%">
+					<div class="form-group row">
+						<div for="example-text-input" class="col-2 col-form-label">
+							@Html.Label("Product Name:")
+						</div>
+						<div class="col-10">
+							<input id="pname" class="form-control" type="text" />
+						</div>
+					</div>
+					<div class="form-group row">
+						<div for="example-text-input" class="col-2 col-form-label">
+							@Html.Label("Manufacturer Name:")
+						</div>
+						<div class="col-10">
+							<input id="pmanufactname" class="form-control" type="text" />
+						</div>
+					</div>
+					<div class="form-group row">
+						<div for="example-text-input" class="col-2 col-form-label">
+							@Html.Label("Size: ")
+						</div>
+						<div class="col-10">
+							<input id="psize" class="form-control" type="text" />
+						</div>
+					</div>
+					<div class="form-group row">
+						<div for="example-text-input" class="col-2 col-form-label">
+							@Html.Label("Color: ")
+						</div>
+						<div class="col-10">
+							<input id="pcolor" class="form-control" type="text" />
+						</div>
+					</div>
+				</div>
+				<div style="float:right;width:45%">
+						<div class="form-group row">
+							<div for="example-text-input" class="col-2 col-form-label">
+								@Html.Label("Main Category: ")
+							</div>
+							<div class="col-10">
+								<div class="form-control">
+									@Html.DropDownList("mainID", (IEnumerable<SelectListItem>)ViewBag.mainID, new { @id = "mainid"})
+								</div>
+							</div>
+						</div>
+						<div class="form-group row">
+							<div for="example-text-input" class="col-2 col-form-label">
+								@Html.Label("Sub Category: ")
+							</div>
+							<div>
+								<div id="men"  style="display:none;">
+									<input id="menList"/>
+								</div>
+								<div id="women"  style="display:none;">
+									<input id="womenList" />
+								</div>
+									
+							</div>
+						</div>
+					<div class="form-group row">
+						<div for="example-text-input" class="col-2 col-form-label">
+							@Html.Label("UnitPrice: ")
+						</div>
+						<div class="col-10">
+							<input id="price" class="form-control" type="text" />
+						</div>
+					</div>
+					<div class="form-group row">
+						<div for="example-text-input" class="col-2 col-form-label">
+							@Html.Label("Units in Stock: ")
+						</div>
+						<div class="col-10">
+							<input id="instock" class="form-control" type="text" />
+						</div>
+					</div>
+				</div>
+				<div class="form-group row">
+					<div class="offset-sm-2 col-sm-10">
+						<button id="addProduct">Add</button>
+						<button id="btnclose" onclick="avgrund.deactivate();">Close</button>
+					</div>
+				</div>
+	</div>
+</div>
+<div class="avgrund-cover"></div>
+@section Scripts{
+	<script type="text/javascript" language="javascript">
+			window.onload=function (){
+				setInterval("var d = new Date(); var days = ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday']; var _m = parseInt(d.getMonth()) + 1; document.getElementById('showtime').innerHTML=days[ d.getDay() ]+' '+d.getFullYear()+'/'+_m+'/'+d.getDate()+' '+d.getHours()+':'+d.getMinutes()+':'+d.getSeconds();", 1000);
+		   }
+	</script>
+
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js"></script>
+<script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
+<script src="https://code.jquery.com/jquery-1.12.4.js"></script>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js" type="text/javascript"></script>
+<script src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.11.1/jquery-ui.min.js" type="text/javascript"></script>
+<script type="text/javascript">
+		(function () {
+			var container = document.documentElement,
+				  popup = document.querySelector('.avgrund-popup'),
+				  cover = document.querySelector('.avgrund-cover'),
+				  currentState = null;
+
+			addClass(container, 'avgrund-ready');
+
+			// Deactivate on ESC
+			function onDocumentKeyUp(event) {
+				if (event.keyCode === 27) {
+					deactivate();
+				}
+			}
+
+			// Deactivate on click outside
+			function onDocumentClick(event) {
+				if (event.target === cover) {
+					deactivate();
+				}
+			}
+
+			function activate(state) {
+				document.addEventListener('keyup', onDocumentKeyUp, false);
+				document.addEventListener('click', onDocumentClick, false);
+
+				removeClass(popup, currentState);
+				addClass(popup, 'no-transition');
+				addClass(popup, state);
+
+				setTimeout(function () {
+					removeClass(popup, 'no-transition');
+					addClass(container, 'avgrund-active');
+				}, 0);
+
+				currentState = state;
+			}
+
+			function deactivate() {
+				document.removeEventListener('keyup', onDocumentKeyUp, false);
+				document.removeEventListener('click', onDocumentClick, false);
+
+				removeClass(container, 'avgrund-active');
+			}
+
+			function disableBlur() {
+				addClass(document.documentElement, 'no-blur');
+			}
+
+			function addClass(element, name) {
+				element.className = element.className.replace(/\s+$/gi, '') + ' ' + name;
+			}
+
+			function removeClass(element, name) {
+				element.className = element.className.replace(name, '');
+			}
+
+			window.avgrund = {
+				activate: activate,
+				deactivate: deactivate,
+				disableBlur: disableBlur
+			}
+
+		})();
+	</script> 
+    <script src="~/Scripts/jquery.min.js"></script>
+	<script src="~/Scripts/kendo.all.min.js"></script>
+	<script type="text/javascript">
+		function popAddPro() {
+			$("#viewCss").click();
+		}
+		/*
+		- Polo3
+- Shirts4
+- Pants5
+- Shoes6
+- Suits7
+- Ties8
+	Accessories 9
+		*/
+
+		/*
+		 Tops10
+- Jeans11
+- Boots12
+- Coats&Outerwear13
+- Dresses14
+- Sweaters15
+- Skirts16
+	*/
+		$("#menList").kendoDropDownList({
+			dataTextField: "text",
+			index: 0,
+			dataValueField: "value",
+			dataSource: [
+				{ text: "-Select-", value: 0 },
+				{ text: "Polo", value: 3},
+				{ text: "Shirts", value: 4 },
+				{ text: "Pants", value: 5 },
+				{ text: "Shoes", value: 6 },
+				{ text: "Suits", value: 7 },
+				{ text: "Ties", value: 8 },
+				{ text: "Accessories", value: 9 },
+			]
+		});
+		$("#womenList").kendoDropDownList({
+			dataTextField: "text",
+			dataValueField: "value",
+			dataSource: [
+				{ text: "-Select-", value: 0 },
+				{ text: "Tops", value: 10 },
+				{ text: "Jeans", value: 11 },
+				{ text: "Boots", value: 12 },
+				{ text: "Coats&Outerwear", value: 13 },
+				{ text: "Dresses", value: 14 },
+				{ text: "Sweaters", value: 15 },
+				{ text: "Skirts", value: 16 },
+			]
+		});
+
+		$("#mainid").change(function () {
+			var mainID = $(this).val();
+			if (mainID == 1) {
+				$("#men").show();
+				$("#women").hide();
+			} else if (mainID == 2) {
+				$("#women").show();
+				$("#men").hide();
+			}
+		});
+		
+		//pname,pmanufactname,psize,pcolor,price,instock,categoryid
+		$("#addProduct  ").on("click", function () {
+			var productName = $("#pname").val(); // product name
+			var manufacturerName = $("#pmanufactname").val(); // manufacturer name
+			var size = $("#psize").val(); // p size
+			var color = $("#pcolor").val(); // color
+			var price = $("#price").val(); // price
+			var unitInStock = $("#instock").val(); // num in stock
+			var userID = @Session["userid"]; // user id
+			var mainid = $("#mainid").val();
+			if (mainid == 0) {
+				alert("Please to select main category!");
+			} else if(mainid == 1) {
+				var categoryID = $("#menList").val();
+				if(categoryID == 0){
+					alert("Please select a subcategory")
+				}
+				var flag = confirm("Are you sure to add it?");
+				if (flag) {
+					$.ajax({
+						type: "GET",
+						contentType: "application/json; charset=utf-8",
+						url: '@Url.Action("addAProduct", "ProductPage")',
+						data: {
+							"userID": userID,
+							"productName": productName,
+							"manufacturerName": manufacturerName,
+							"size": size,
+							"color": color,
+							"categoryID": categoryID,
+							"price": price,
+							"unitInStock":unitInStock
+						},
+						dataType: "json",
+						beforeSend: function () {
+
+						},
+						success: function () {
+						}
+					});
+					$("#btnclose").click();
+					window.location.reload();
+				}
+			} else if (mainid == 2) {
+				var categoryID = $("#womenList").val();
+				if (flag) {
+					$.ajax({
+						type: "GET",
+						contentType: "application/json; charset=utf-8",
+						url: '@Url.Action("addAProduct", "ProductPage")',
+						data: {
+							"userID": userID,
+							"productName": productName,
+							"manufacturerName": manufacturerName,
+							"size": size,
+							"color": color,
+							"categoryID": categoryID,
+							"price": price,
+							"unitInStock": unitInStock
+						},
+						dataType: "json",
+						beforeSend: function () {
+
+						},
+						success: function (data) {
+						}
+					});
+					$("#btnclose").click();
+					window.location.reload();
+				}
+			}
+			
+			
+		});
+	</script>
+}

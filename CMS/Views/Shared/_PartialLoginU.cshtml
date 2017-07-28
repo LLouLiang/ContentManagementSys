@@ -1,0 +1,26 @@
+﻿<ul class="nav navbar-nav">
+	<li class="dd">
+		@Html.ActionLink("Products", "Products", "ProductPage")
+		<div class="dc">
+			<p>@Html.ActionLink("Colors", "ColorView", "Color")</p>
+			<p>@Html.ActionLink("Sizes", "SizeView", "Size")</p>
+		</div>
+	</li>
+	<li class="dd">
+		@Html.ActionLink("Orders", "OrdersView", "Orders")
+		<div class="dc">
+			<p>@Html.ActionLink("Inventrory Report", "InventoryReports", "InventoryReports")</p>
+			<p>@Html.ActionLink("Sales Report", "SalesReports", "SalesReports")</p>
+		</div>
+	</li>
+</ul>
+	
+
+<div style="float:right">
+	<ul class="nav navbar-nav">
+		<li>
+			@Html.ActionLink("Log out", "LoginPageView", "LoginPage")
+		</li>
+	</ul>
+</div>
+

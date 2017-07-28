@@ -1,0 +1,46 @@
+﻿@{
+	ViewBag.Title = "ProByCatView";
+	if (Session["userrole"] == null)
+	{
+		Html.Action("LoginPageView", "LoginPage");
+	}
+	else
+	{
+		int userid = (int)Session["userid"];
+		string userrole = Session["userrole"].ToString();
+		if (userrole.Equals("SR"))
+		{
+			Layout = "~/Views/Shared/LoginLayoutSP.cshtml";
+		}
+		else if (userrole.Equals("A"))
+		{
+			Layout = "~/Views/Shared/LoginLayout.cshtml";
+		}
+		else
+		{
+
+		}
+	}
+	var grid1 = new WebGrid( Model, canPage: true, rowsPerPage: 10, columnNames: new[] { "productID", "ProductName", "manufacturerName", "UnitPrice", "categoryID" });
+	grid1.Pager(WebGridPagerModes.All);
+}
+
+<div style="text-align:right">
+	<h9>
+		Welcome!
+	</h9>@Session["name"].ToString()<br />
+	@Html.Label("Today is:")<h9 style="font-family: BlinkMacSystemFont">@DateTime.Now.DayOfWeek</h9>/<h9 style="font-family: BlinkMacSystemFont">@DateTime.Now.Month</h9>/<h9 style="font-family: BlinkMacSystemFont">@DateTime.Now.Day</h9>/<h9 style="font-family: BlinkMacSystemFont">@DateTime.Now.Year</h9>
+</div>
+
+@grid1.GetHtml(
+    fillEmptyRows: false,
+    mode: WebGridPagerModes.All,
+
+    columns: grid1.Columns(
+
+        grid1.Column("productID", header: "ProductID "),
+        grid1.Column("ProductName", header: "ProductName "),
+        grid1.Column("manufacturerName", header: "Manufacturer "),
+        grid1.Column("UnitPrice", header: "Price "),
+        grid1.Column("categoryID", header: "CategoryID")
+        ))

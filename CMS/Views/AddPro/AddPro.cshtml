@@ -1,0 +1,148 @@
+﻿@model CMS.Controllers.AddProModel
+@{
+    ViewBag.Title = "AddPro";
+    if (Session["userrole"] == null)
+    {
+        Html.Action("LoginPageView", "LoginPage");
+    }
+    else
+    {
+        int userid = (int)Session["userid"];
+        string userrole = Session["userrole"].ToString();
+        if (userrole.Equals("SR"))
+        {
+            Layout = "~/Views/Shared/LoginLayoutSP.cshtml";
+        }
+        else if (userrole.Equals("A"))
+        {
+            Layout = "~/Views/Shared/LoginLayout.cshtml";
+        }
+        else
+        {
+
+        }
+    }
+}
+
+<div class="row">
+	<div class="col-md-6">
+		<h2>Create a product</h2>
+	</div>
+	<div class="col-md-6" style="text-align:right">
+		<br />
+		<h9>
+			Welcome!
+		</h9>@Session["name"].ToString()<br />
+		<p id="showtime"></p>
+	</div>
+</div>
+<div class="row">
+	@using (Html.BeginForm("AddPro", "AddPro", new { @class = "form-horizontal", role = "form" }))
+	{ @Html.ValidationSummary(true)
+		{
+		<div style="float:left;width:45%">
+			<div class="form-group row">
+				<div for="example-text-input" class="col-2 col-form-label">
+					@Html.Label("Product Name:")
+				</div>
+				<div class="col-10">
+					<div class="form-control">
+						@Html.TextBoxFor(m => m.productName)
+						@Html.ValidationMessageFor(model => model.productName, "", new { @class = "text-danger" })
+					</div>
+				</div>
+			</div>
+			<div class="form-group row">
+				<div for="example-text-input" class="col-2 col-form-label">
+					@Html.Label("Manufacturer Name:")
+				</div>
+				<div class="col-10">
+					<div class="form-control">
+						@Html.TextBoxFor(m => m.manufactName)
+						@Html.ValidationMessageFor(model => model.manufactName, "", new { @class = "text-danger" })
+					</div>
+				</div>
+			</div>
+			<div class="form-group row">
+				<div for="example-text-input" class="col-2 col-form-label">
+					@Html.Label("Size: ")
+				</div>
+				<div class="col-10">
+					<div class="form-control">
+						@Html.TextBoxFor(m => m.size)
+						@Html.ValidationMessageFor(model => model.size, "", new { @class = "text-danger" })
+					</div>
+				</div>
+			</div>
+			<div class="form-group row">
+				<div for="example-text-input" class="col-2 col-form-label">
+					@Html.Label("Color: ")
+				</div>
+				<div class="col-10">
+					<div class="form-control">
+						@Html.TextBoxFor(m => m.color)
+						@Html.ValidationMessageFor(model => model.color, "", new { @class = "text-danger" })
+					</div>
+				</div>
+			</div>
+		</div>
+		<div style="float:right;width:45%">
+			<div class="form-group row">
+				<div for="example-text-input" class="col-2 col-form-label">
+					@Html.Label("Main Category: ")
+				</div>
+				<div class="col-10">
+					<div class="form-control">
+						@Html.DropDownList("mainID", (IEnumerable<SelectListItem>)ViewBag.mainID, new { onchange = "this.form.submit()" })
+					</div>
+				</div>
+			</div>
+			<div class="form-group row">
+				<div for="example-text-input" class="col-2 col-form-label">
+					@Html.Label("Sub Category: ")
+				</div>
+				<div class="col-10">
+					<div class="form-control">
+						@Html.DropDownList("subID", (IEnumerable<SelectListItem>)ViewBag.subID)
+					</div>
+				</div>
+			</div>
+			<div class="form-group row">
+				<div for="example-text-input" class="col-2 col-form-label">
+					@Html.Label("UnitPrice: ")
+				</div>
+				<div class="col-10">
+					<div class="form-control">
+						@Html.TextBoxFor(m => m.price)
+						@Html.ValidationMessageFor(model => model.price, "", new { @class = "text-danger" })
+					</div>
+				</div>
+			</div>
+			<div class="form-group row">
+				<div for="example-text-input" class="col-2 col-form-label">
+					@Html.Label("Units in Stock: ")
+				</div>
+				<div class="col-10">
+					<div class="form-control">
+						@Html.TextBoxFor(m => m.inStock)
+						@Html.ValidationMessageFor(model => model.inStock, "", new { @class = "text-danger" })
+					</div>
+				</div>
+			</div>
+		</div>
+				<div class="form-group row">
+					<div class="offset-sm-2 col-sm-10">
+						<input type="submit" class="btn btn-primary" value="Add to Inventory" />
+					</div>
+				</div>
+		}
+	}
+</div>
+
+@section Scripts{
+	<script type="text/javascript" language="javascript">
+			window.onload=function (){
+				setInterval("var d = new Date(); var days = ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday']; var _m = parseInt(d.getMonth()) + 1; document.getElementById('showtime').innerHTML=days[ d.getDay() ]+' '+d.getFullYear()+'/'+_m+'/'+d.getDate()+' '+d.getHours()+':'+d.getMinutes()+':'+d.getSeconds();", 1000);
+		   }
+	</script>
+}
